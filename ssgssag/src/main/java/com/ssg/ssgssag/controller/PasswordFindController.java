@@ -1,7 +1,7 @@
 package com.ssg.ssgssag.controller;
 
 import com.ssg.ssgssag.service.PasswordFindService;
-import com.ssg.ssgssag.service.UtilService;
+//import com.ssg.ssgssag.service.UtilService;
 import io.swagger.v3.oas.annotations.Operation;
 import java.util.concurrent.CompletableFuture;
 import lombok.Builder;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class PasswordFindController {
 
     private final PasswordFindService passwordFindService;
-    private final UtilService utilService;
+//    private final UtilService utilService;
 
 
     @GetMapping("/find-password")
@@ -37,9 +37,9 @@ public class PasswordFindController {
         String tempPassword = passwordFindService.getRandomPassword();
         String email = passwordFindService.selectEmailById(inputId);
 
-        CompletableFuture.runAsync(()->
-            utilService.sendResetPasswordLink(email, tempPassword)
-        );
+//        CompletableFuture.runAsync(()->
+//            utilService.sendResetPasswordLink(email, tempPassword)
+//        );
 
         String encryptPassword = passwordFindService.getTempPassword(tempPassword);
         passwordFindService.updateTempPassword(inputId, encryptPassword);

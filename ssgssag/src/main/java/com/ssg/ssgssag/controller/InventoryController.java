@@ -4,7 +4,7 @@ import com.ssg.ssgssag.domain.InventoryHistoryVO;
 import com.ssg.ssgssag.domain.InventoryVO;
 import com.ssg.ssgssag.dto.*;
 import com.ssg.ssgssag.service.InventoryService;
-import com.ssg.ssgssag.service.UtilService;
+//import com.ssg.ssgssag.service.UtilService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -22,7 +22,7 @@ import java.util.concurrent.CompletableFuture;
 public class InventoryController {
 
     private final InventoryService inventoryService;
-    private final UtilService utilService;
+//    private final UtilService utilService;
 
     @GetMapping("/list")
     @Operation(summary = "재고 목록 출력", description = "재고 조회 리스트 모두 출력")
@@ -84,7 +84,7 @@ public class InventoryController {
     public void selectedInventory(@RequestBody InventoryAdjustmentDTO dto) {
         inventoryService.updateInventoryWithHistoryCnt(dto);
         // 비동기 처리
-        CompletableFuture.runAsync(() -> utilService.sendShortageNotificationEmails());
+//        CompletableFuture.runAsync(() -> utilService.sendShortageNotificationEmails());
 
     }
 
