@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <th:block th:replace="/layout/head :: headFragment"></th:block>
+  <th:block th:replace="layout/head :: headFragment"></th:block>
   <title>입고 리스트</title>
 </head>
 <body>
@@ -9,7 +9,7 @@
 <!--*******************
     Preloader start
 ********************-->
-<th:block th:replace="/layout/preloader :: preloaderFragment"></th:block>
+<th:block th:replace="layout/preloader :: preloaderFragment"></th:block>
 <!--*******************
     Preloader end
 ********************-->
@@ -23,7 +23,7 @@
   <!--**********************************
       Nav header start
   ***********************************-->
-  <th:block th:replace="/layout/nav :: navFragment"></th:block>
+  <th:block th:replace="layout/nav :: navFragment"></th:block>
 
  <!--**********************************
       Header end ti-comment-alt
@@ -32,7 +32,7 @@
   <!--**********************************
       Sidebar start
   ***********************************-->
-  <th:block th:replace="/layout/sidebar :: sidebarFragment"></th:block>
+  <th:block th:replace="layout/sidebar :: sidebarFragment"></th:block>
   <!--**********************************
       Sidebar end
   ***********************************-->
@@ -297,7 +297,7 @@
   <!--**********************************
       Scripts
   ***********************************-->
-  <th:block th:replace="/layout/script :: scriptFragment"></th:block>
+  <th:block th:replace="layout/script :: scriptFragment"></th:block>
   <script th:src="@{/js/Incoming.js}"></script>
 </div>
 </body>
