@@ -79,5 +79,8 @@ compileJava.dependsOn('clean')
 
 
 bootJar {
-    archiveFileName = 'ssgssag-0.0.1-SNAPSHOT.jar'
+    archiveBaseName.set('trelloServer')
+}
+jar{
+    archiveBaseName.set('trelloServer')
 }
