@@ -38,14 +38,14 @@ jobs:
 
     # 디버깅
     - name: List files for debugging
-      run: ls -la build/libs/
+      run: ls -la ssgssag/build/libs/
 
     # 빌드해서 생긴 JAR 파일을 깃허브 아티팩트로 업로드!!
     - name: Upload build artifact
       uses: actions/upload-artifact@v2
       with:
         name: ssgssag
-        path: build/libs/ssgssag-0.0.1-SNAPSHOT.jar
+        path: ssgssag/build/libs/ssgssag-0.0.1-SNAPSHOT.jar
 
    # 배포 **
   deploy:
@@ -58,7 +58,7 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: ssgssag
-        path: build/libs/
+        path: ssgssag/build/libs/
 
     # EC2에 배포
     # EC2 SSH 키를 private_key.pem 파일로 저장 ( 위치는 GitHub 서버 )
@@ -69,6 +69,6 @@ jobs:
       run: |
         echo "${{ secrets.EC2_SSH_KEY }}" > private_key.pem
         chmod 600 private_key.pem
-        scp -i private_key.pem -o StrictHostKeyChecking=no build/libs/ssgssag-0.0.1-SNAPSHOT.jar ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USERNAME }}/ssgssag.jar
+        scp -i private_key.pem -o StrictHostKeyChecking=no ssgssag/build/libs/ssgssag-0.0.1-SNAPSHOT.jar ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USERNAME }}/ssgssag.jar
         ssh -i private_key.pem -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "pgrep java | xargs kill -9; nohup java -jar /home/${{ secrets.EC2_USERNAME }}/ssgssag.jar > app.log 2>&1 &"
         rm -f private_key.pem
