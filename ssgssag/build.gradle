@@ -76,3 +76,8 @@ tasks.named('bootBuildImage') {
 //}
 
 compileJava.dependsOn('clean')
+
+
+bootJar {
+    archiveFileName = 'ssgssag-0.0.1-SNAPSHOT.jar'
+}
