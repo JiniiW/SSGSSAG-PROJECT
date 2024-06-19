@@ -75,8 +75,8 @@ compileJava.dependsOn('clean')
 
 
 bootJar {
-    archiveBaseName.set('trelloServer')
+    archiveBaseName.set('ssgssagServer')
 }
 jar{
-    archiveBaseName.set('trelloServer')
+    archiveBaseName.set('ssgssagServer')
 }
