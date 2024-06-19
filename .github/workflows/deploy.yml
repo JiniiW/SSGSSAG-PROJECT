@@ -33,6 +33,7 @@ jobs:
 
     # Gradle 빌드 엑션을 이용해서 프로젝트 빌드
     - name: Build with Gradle
+      working-directory: ssgssag
       uses: gradle/gradle-build-action@v2.6.0
       with:
         arguments: build
