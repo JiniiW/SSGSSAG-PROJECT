@@ -77,6 +77,5 @@ compileJava.dependsOn('clean')
 
 
 jar {
-    archiveBaseName.set('ssgssag')
-    archiveVersion.set('0.0.1-SNAPSHOT')
+    archiveFileName = 'ssgssag-0.0.1-SNAPSHOT.jar'
 }
