@@ -36,12 +36,16 @@ jobs:
       working-directory: ssgssag
       run: ./gradlew build
 
+    # 디버깅
+    - name: List files for debugging
+      run: ls -la build/libs/
+
     # 빌드해서 생긴 JAR 파일을 깃허브 아티팩트로 업로드!!
     - name: Upload build artifact
       uses: actions/upload-artifact@v2
       with:
-        name: ssgssagServer
-        path: build/libs/ssgssagServer-0.0.1-SNAPSHOT.jar
+        name: ssgssag
+        path: build/libs/ssgssag-0.0.1-SNAPSHOT.jar
 
    # 배포 **
   deploy:
@@ -53,7 +57,7 @@ jobs:
     - name: Download build artifact
       uses: actions/download-artifact@v2
       with:
-        name: ssgssagServer
+        name: ssgssag
         path: build/libs/
 
     # EC2에 배포
@@ -65,6 +69,6 @@ jobs:
       run: |
         echo "${{ secrets.EC2_SSH_KEY }}" > private_key.pem
         chmod 600 private_key.pem
-        scp -i private_key.pem -o StrictHostKeyChecking=no build/libs/ssgssagServer-0.0.1-SNAPSHOT.jar ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USERNAME }}/ssgssagServer.jar
-        ssh -i private_key.pem -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "pgrep java | xargs kill -9; nohup java -jar /home/${{ secrets.EC2_USERNAME }}/ssgssagServer.jar > app.log 2>&1 &"
+        scp -i private_key.pem -o StrictHostKeyChecking=no build/libs/ssgssag-0.0.1-SNAPSHOT.jar ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USERNAME }}/ssgssag.jar
+        ssh -i private_key.pem -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "pgrep java | xargs kill -9; nohup java -jar /home/${{ secrets.EC2_USERNAME }}/ssgssag.jar > app.log 2>&1 &"
         rm -f private_key.pem
