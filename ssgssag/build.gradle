@@ -4,7 +4,7 @@ plugins {
     id 'io.spring.dependency-management' version '1.1.4'
 }
 
-group = 'com.ssg.ssgssag'
+group = 'ssgssag'
 version = '0.0.1-SNAPSHOT'
 
 java {
@@ -65,6 +65,8 @@ dependencies {
     // 메일 적용
     implementation 'org.springframework.boot:spring-boot-starter-mail'
 
+    implementation 'org.springframework.boot:spring-boot-starter'
+
 }
 
 tasks.named('bootBuildImage') {
@@ -75,6 +77,6 @@ compileJava.dependsOn('clean')
 
 
 jar {
-    archiveBaseName.set('ssgssagServer')
+    archiveBaseName.set('ssgssag')
     archiveVersion.set('0.0.1-SNAPSHOT')
 }
