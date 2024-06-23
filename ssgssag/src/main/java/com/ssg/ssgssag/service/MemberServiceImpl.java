@@ -31,9 +31,11 @@ import org.springframework.ui.Model;
 @Transactional
 public class MemberServiceImpl implements MemberService{
 
+    @Autowired
     private final MemberMapper memberMapper;
 
     private final PasswordEncoder passwordEncoder;
+    @Autowired
     private ModelMapper modelMapper;
 
     @Override
