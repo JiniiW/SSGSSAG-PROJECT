@@ -43,6 +43,7 @@ dependencies {
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.mysql:mysql-connector-j'
+    implementation "com.h2database:h2" // h2 추가
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.3'
@@ -65,7 +66,7 @@ dependencies {
     // 메일 적용
     implementation 'org.springframework.boot:spring-boot-starter-mail'
 
-    implementation 'org.springframework.boot:spring-boot-starter'
+//    implementation 'org.springframework.boot:spring-boot-starter'
 
 }
 
@@ -77,5 +78,5 @@ compileJava.dependsOn('clean')
 
 
 jar {
-    archiveFileName = 'ssgssag-0.0.1-SNAPSHOT.jar'
+    enabled = false
 }

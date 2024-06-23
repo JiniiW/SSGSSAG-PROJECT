@@ -35,16 +35,8 @@ public class MemberServiceImpl implements MemberService{
     private final MemberMapper memberMapper;
 
     private final PasswordEncoder passwordEncoder;
-    private ModelMapper modelMapper = new ModelMapper();
-
-    @Bean
-    public ModelMapper modelMapper() {
-        modelMapper.getConfiguration()
-            .setFieldAccessLevel(AccessLevel.PRIVATE)
-            .setFieldMatchingEnabled(true);
-
-        return modelMapper;
-    }
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Override
     public void registerMember(MemberDTO member) {
@@ -52,7 +44,6 @@ public class MemberServiceImpl implements MemberService{
         MemberVO memberVO = modelMapper.map(member, MemberVO.class);
         memberMapper.insertMembers(memberVO);
     }
-
 
     @Override
     public MemberVO getMemberByMemberId(String memberId) {
@@ -78,13 +69,11 @@ public class MemberServiceImpl implements MemberService{
         return memberMapper.getOneMemberInfo(memberId);
     }
 
-    //총관리자가 회원 수정
     @Override
     public void modifyMembersByAdmin(MemberDTO memberDTO) {
         MemberVO memberVO = modelMapper.map(memberDTO, MemberVO.class);
         memberMapper.updateMembersByMemberId(memberVO);
     }
-
 
     @Override
     public void modifyMemberInfo(MemberDTO memberDTO) {
@@ -97,22 +86,18 @@ public class MemberServiceImpl implements MemberService{
         return memberMapper.checkId(vMemberId);
     }
 
-
     @Override
     public UserDetails loadUserByUsername(String memberId) throws UsernameNotFoundException {
-
         MemberVO memberVO = memberMapper.getOneMemberInfo(memberId);
-
         if (memberVO == null) {
-            throw new UsernameNotFoundException("사용자를 찾을수 없습니다.");
+            throw new UsernameNotFoundException("사용자를 찾을 수 없습니다.");
         }
         List<GrantedAuthority> authorities = new ArrayList<>();
         if ("ADMIN".equals(memberVO.getvMemberAuth())) {
             authorities.add(new SimpleGrantedAuthority(MemberRole.ADMIN.getValue()));
         } if ("WAREHOUSE_MANAGER".equals(memberVO.getvMemberAuth())) {
             authorities.add(new SimpleGrantedAuthority(MemberRole.WAREHOUSE_MANAGER.getValue()));
-        }
-        else {
+        } else {
             authorities.add(new SimpleGrantedAuthority(MemberRole.OPERATOR.getValue()));
         }
         return new User(memberVO.getvMemberId(), memberVO.getvMemberPw(), authorities);
@@ -121,8 +106,7 @@ public class MemberServiceImpl implements MemberService{
     @Override
     public MemberVO login(MemberDTO memberDTO) {
         return memberMapper.login(memberDTO.getvMemberId(),
-            passwordEncoder.encode(memberDTO.getvMemberPw()));
-
+                passwordEncoder.encode(memberDTO.getvMemberPw()));
     }
 
     @Override
@@ -144,7 +128,6 @@ public class MemberServiceImpl implements MemberService{
         } else {
             return null;
         }
-
     }
 
     @Override
@@ -154,11 +137,9 @@ public class MemberServiceImpl implements MemberService{
             memberMapper.deleteMemberInfo(memberVO);
             SecurityContextHolder.clearContext();
             return true;
-
         } catch (Exception e) {
             log.error(e.getMessage());
             return false;
         }
     }
-
 }
