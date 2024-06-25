@@ -59,6 +59,16 @@ jobs:
       with:
         name: ssgssag
         path: ssgssag/build/libs/
+
+    # mysql 정보
+    - name: Create application-db.properties
+      run: |
+        echo "spring.datasource.url=${{ secrets.DB_URL }}" > application-db.properties
+        echo "spring.datasource.username=${{ secrets.DB_USERNAME }}" >> application-db.properties
+        echo "spring.datasource.password=${{ secrets.DB_PASSWORD }}" >> application-db.properties
+        echo "spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver" >> application-db.properties
+
+    
     # EC2에 배포
     # EC2 SSH 키를 private_key.pem 파일로 저장 ( 위치는 GitHub 서버 )
     # SCP를 사용하여 JAR 파일을 EC2 서버로 복사
