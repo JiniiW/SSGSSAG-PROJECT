@@ -75,8 +75,8 @@ jobs:
       # 애플리케이션의 데이터베이스 연결 정보를 설정 파일에 추가합니다.
       - name: Configure application properties
         run: |
-          echo "spring.datasource.url=${{ secrets.DB_URL }}" >> ssgssag/src/main/resources/application.properties
-          echo "spring.datasource.username=${{ secrets.DB_USERNAME }}" >> ssgssag/src/main/resources/application.properties
-          echo "spring.datasource.password=${{ secrets.DB_PASSWORD }}" >> ssgssag/src/main/resources/application.properties
-          echo "spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver" >> ssgssag/src/main/resources/application.properties
+          echo "spring.datasource.url=${{ secrets.DB_URL }}" >> src/main/resources/application.properties
+          echo "spring.datasource.username=${{ secrets.DB_USERNAME }}" >> src/main/resources/application.properties
+          echo "spring.datasource.password=${{ secrets.DB_PASSWORD }}" >> src/main/resources/application.properties
+          echo "spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver" >> src/main/resources/application.properties
         working-directory: ${{ github.workspace }}/ssgssag
