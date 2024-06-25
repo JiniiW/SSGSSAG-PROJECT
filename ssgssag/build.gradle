@@ -53,12 +53,8 @@ dependencies {
     implementation 'net.coobird:thumbnailator:0.4.16'
     implementation 'com.fasterxml.jackson.core:jackson-databind'
 
-
-    //spring security 적용
-//    implementation 'org.springframework.boot:spring-boot-starter-security'
-//    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
-
     implementation 'org.springframework.boot:spring-boot-starter-security'
+
     //  Temporary explicit version to fix Thymeleaf bug
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6:3.1.1.RELEASE'
     testImplementation 'org.springframework.security:spring-security-test'
@@ -66,9 +62,6 @@ dependencies {
 
     // 메일 적용
     implementation 'org.springframework.boot:spring-boot-starter-mail'
-
-//    implementation 'org.springframework.boot:spring-boot-starter'
-
 }
 
 tasks.named('bootBuildImage') {
