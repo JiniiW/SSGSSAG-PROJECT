@@ -72,11 +72,10 @@ jobs:
           # 사용한 SSH 키 파일을 삭제합니다.
           rm -f private_key.pem
 
-      - name: Configure application properties
+      # db 정보 설정
+      - name: Configure DB application properties
         run: |
-          mkdir -p ssgssag/src/main/resources  # 필요에 따라 디렉토리 생성
-          echo "spring.datasource.url=${{ secrets.DB_URL }}" >> ssgssag/src/main/resources/application.properties
-          echo "spring.datasource.username=${{ secrets.DB_USERNAME }}" >> ssgssag/src/main/resources/application.properties
-          echo "spring.datasource.password=${{ secrets.DB_PASSWORD }}" >> ssgssag/src/main/resources/application.properties
-          echo "spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver" >> ssgssag/src/main/resources/application.properties
-        working-directory: ${{ github.workspace }}
+          # 기존 파일 내용 유지하면서 환경 변수로 값 대체
+          sed -i 's|${DB_URL}|${{ secrets.DB_URL }}|g' ssgssag/src/main/resources/application.properties
+          sed -i 's|${DB_USERNAME}|${{ secrets.DB_USERNAME }}|g' ssgssag/src/main/resources/application.properties
+          sed -i 's|${DB_PASSWORD}|${{ secrets.DB_PASSWORD }}|g' ssgssag/src/main/resources/application.properties
