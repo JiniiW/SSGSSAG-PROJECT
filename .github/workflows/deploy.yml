@@ -1,4 +1,4 @@
-name: Java CI with Gradle
+name: Java CI/CD with Gradle
 
 # 이 워크플로우는 main 브랜치로의 push와 pull request를 트리거로 실행됩니다.
 on:
@@ -58,6 +58,10 @@ jobs:
 
       # EC2 인스턴스에 애플리케이션을 배포합니다.
       - name: Deploy to EC2
+        env:
+          DB_URL: ${{ secrets.DB_URL }}
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         run: |
           # EC2 SSH 키를 private_key.pem 파일로 저장합니다.
           echo "${{ secrets.EC2_SSH_KEY }}" > private_key.pem
@@ -66,21 +70,23 @@ jobs:
           # SCP를 사용하여 빌드된 JAR 파일을 EC2 서버로 복사합니다.
           scp -i private_key.pem -o StrictHostKeyChecking=no ssgssag/build/libs/ssgssag-0.0.1-SNAPSHOT.jar ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USERNAME }}/ssgssag.jar
           
-          # SSH를 사용하여 EC2 서버에 연결하고 이전 Java 프로세스를 종료하고 새로운 프로세스를 실행합니다.
-          ssh -i private_key.pem -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "pgrep java | xargs kill -9; nohup java -jar /home/${{ secrets.EC2_USERNAME }}/ssgssag.jar > app.log 2>&1 &"
+          # SSH를 사용하여 EC2 서버에 연결하고 환경 변수를 적용한 application.properties 파일을 생성합니다.
+          ssh -i private_key.pem -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} << 'EOF'
+            export DB_URL=${DB_URL}
+            export DB_USERNAME=${DB_USERNAME}
+            export DB_PASSWORD=${DB_PASSWORD}
+  
+            # 기존 application.properties 파일에 환경 변수를 설정합니다.
+            echo "
+            spring.datasource.url=\${DB_URL}
+            spring.datasource.username=\${DB_USERNAME}
+            spring.datasource.password=\${DB_PASSWORD}
+            " >> /home/${{ secrets.EC2_USERNAME }}/application.properties
+  
+            # 이전 Java 프로세스를 종료하고 새로운 프로세스를 실행합니다.
+            pgrep java | xargs kill -9 || true
+            nohup java -jar /home/${{ secrets.EC2_USERNAME }}/ssgssag.jar --spring.config.location=/home/${{ secrets.EC2_USERNAME }}/application.properties > app.log 2>&1 &
+          EOF
           
           # 사용한 SSH 키 파일을 삭제합니다.
           rm -f private_key.pem
-
-      # db 정보 설정
-      - name: Configure application properties
-        run: |
-          mkdir -p ssgssag/src/main/resources
-          echo "spring.datasource.url=${DB_URL}" > ssgssag/src/main/resources/application.properties
-          echo "spring.datasource.username=${DB_USERNAME}" >> ssgssag/src/main/resources/application.properties
-          echo "spring.datasource.password=${DB_PASSWORD}" >> ssgssag/src/main/resources/application.properties
-          echo "spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver" >> ssgssag/src/main/resources/application.properties
-          
-          sed -i 's|${DB_URL}|${{ secrets.DB_URL }}|g' ssgssag/src/main/resources/application.properties
-          sed -i 's|${DB_USERNAME}|${{ secrets.DB_USERNAME }}|g' ssgssag/src/main/resources/application.properties
-          sed -i 's|${DB_PASSWORD}|${{ secrets.DB_PASSWORD }}|g' ssgssag/src/main/resources/application.properties
