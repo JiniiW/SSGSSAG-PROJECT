@@ -74,7 +74,13 @@ jobs:
 
       # db 정보 설정
       - name: Configure application properties
-        run: 
+        run: |
+          mkdir -p ssgssag/src/main/resources
+          echo "spring.datasource.url=${DB_URL}" > ssgssag/src/main/resources/application.properties
+          echo "spring.datasource.username=${DB_USERNAME}" >> ssgssag/src/main/resources/application.properties
+          echo "spring.datasource.password=${DB_PASSWORD}" >> ssgssag/src/main/resources/application.properties
+          echo "spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver" >> ssgssag/src/main/resources/application.properties
+          
           sed -i 's|${DB_URL}|${{ secrets.DB_URL }}|g' ssgssag/src/main/resources/application.properties
           sed -i 's|${DB_USERNAME}|${{ secrets.DB_USERNAME }}|g' ssgssag/src/main/resources/application.properties
           sed -i 's|${DB_PASSWORD}|${{ secrets.DB_PASSWORD }}|g' ssgssag/src/main/resources/application.properties
