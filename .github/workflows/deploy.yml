@@ -35,6 +35,15 @@ jobs:
       # Grant execute permission for gradlew
       - name: Grant Execute Permission for Gradlew
         run: chmod +x ssgssag/gradlew
+
+      # Build Project with Gradle
+      - name: Build with Gradle
+        working-directory: ssgssag
+        run: ./gradlew build
+
+      # Ensure build/libs directory exists and contains necessary files
+      - name: List files in build/libs directory
+        run: ls -la ./build/libs/
         
       - name: Build Project
         run: |
@@ -44,7 +53,7 @@ jobs:
           echo "    url: ${{ secrets.URL }}" >> ssgssag/src/main/resources/application-db.yml
           echo "    username: ${{ secrets.USERNAME }}" >> ssgssag/src/main/resources/application-db.yml
           echo "    password: ${{ secrets.PASSWORD }}" >> ssgssag/src/main/resources/application-db.yml
-        
+
 
       # Deploy to Remote Server
       - name: Deploy to Remote Server
