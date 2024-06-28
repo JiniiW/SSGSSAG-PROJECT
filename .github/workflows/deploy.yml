@@ -35,7 +35,7 @@ jobs:
       
        # Grant execute permission for gradlew
       - name: Grant Execute Permission for Gradlew
-        run: chmod +x ./gradlew
+        run: chmod +x ssgssag/gradlew
         
       - name: Build Project
         run: |
