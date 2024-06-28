@@ -43,7 +43,7 @@ jobs:
 
       # Ensure build/libs directory exists and contains necessary files
       - name: List files in build/libs directory
-        run: ls -la ./build/libs/
+        run: ls -la ssgssag/build/libs/
         
       - name: Build Project
         run: |
