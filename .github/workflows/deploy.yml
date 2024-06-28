@@ -79,6 +79,6 @@ jobs:
 
           # Restart the application
           ssh $SERVER_USER@$SERVER_HOST 'bash -s' << 'EOF'
-            chmod +x /opt/susussg-backend/run.sh
-            /opt/susussg-backend/run.sh restart
+            chmod +x /opt/ssgssag/run.sh
+            /opt/ssgssag/run.sh restart
           EOF
