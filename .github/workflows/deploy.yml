@@ -77,8 +77,16 @@ jobs:
           scp ssgssag/src/main/resources/application-db.yml $SERVER_USER@$SERVER_HOST:/opt/ssgssag/config/
           # scp ssgssag/src/main/resources/application-secret.properties $SERVER_USER@$SERVER_HOST:/opt/ssgssag/config/
 
-          # Restart the application
-          ssh $SERVER_USER@$SERVER_HOST 'bash -s' << 'EOF'
-            chmod +x /opt/ssgssag/run.sh
-            /opt/ssgssag/run.sh restart
+          # Write and upload script to execute the JAR file
+          cat << 'EOF' > ./run.sh
+          #!/bin/bash
+          java -jar /opt/ssgssag/ssgssag-0.0.1-SNAPSHOT.jar
           EOF
+          
+          scp ./run.sh $SERVER_USER@$SERVER_HOST:/opt/ssgssag/
+          
+          # Grant execute permission to run.sh
+          ssh $SERVER_USER@$SERVER_HOST 'chmod +x /opt/ssgssag/run.sh'
+          
+          # Execute run.sh to start the application
+          ssh $SERVER_USER@$SERVER_HOST '/opt/ssgssag/run.sh'
