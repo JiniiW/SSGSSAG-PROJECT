@@ -48,7 +48,7 @@ jobs:
           echo "    url: ${{ secrets.URL }}" >> ssgssag/src/main/resources/application-db.yml
           echo "    username: ${{ secrets.USERNAME }}" >> ssgssag/src/main/resources/application-db.yml
           echo "    password: ${{ secrets.PASSWORD }}" >> ssgssag/src/main/resources/application-db.yml
-        
+
 
       # Deploy to Remote Server
       - name: Deploy to Remote Server
