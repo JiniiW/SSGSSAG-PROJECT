@@ -36,6 +36,11 @@ jobs:
       - name: Grant Execute Permission for Gradlew
         run: chmod +x ssgssag/gradlew
 
+      # Build Project with Gradle
+      - name: Build with Gradle
+        working-directory: ssgssag
+        run: ./gradlew build
+
       # Ensure build/libs directory exists and contains necessary files
       - name: List files in build/libs directory
         run: ls -la ./build/libs/
@@ -68,7 +73,7 @@ jobs:
           EOF
           
           # Copy files to the deployment folder
-          scp ./build/libs/ssgssag-0.0.1-SNAPSHOT.jar $SERVER_USER@$SERVER_HOST:/opt/ssgssag/
+          scp ssgssag/build/libs/ssgssag-0.0.1-SNAPSHOT.jar $SERVER_USER@$SERVER_HOST:/opt/ssgssag/
           scp ssgssag/src/main/resources/application-db.yml $SERVER_USER@$SERVER_HOST:/opt/ssgssag/config/
           scp ssgssag/src/main/resources/application-secret.properties $SERVER_USER@$SERVER_HOST:/opt/ssgssag/config/
 
