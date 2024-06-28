@@ -1,92 +1,75 @@
-name: Java CI/CD with Gradle
+name: Deploy Java Project
 
-# 이 워크플로우는 main 브랜치로의 push와 pull request를 트리거로 실행됩니다.
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
-  build:
+  deploy:
+    name: Deploy to Linux Server
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
 
     steps:
-      # GitHub 저장소를 체크아웃합니다.
-      - uses: actions/checkout@v4
-
-      # JDK 17을 설정합니다.
+      # Checkout the repository
+      - name: Checkout Code
+        uses: actions/checkout@v2
+        
+      - name: Setup SSH Agent
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+          
+      # Setup JDK 17
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      # Gradle 빌드 스크립트에 실행 권한을 부여합니다.
-      - name: Grant execute permission for gradlew
-        run: chmod +x ssgssag/gradlew
+      # Build the project using Gradle
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v3
 
-      # Gradle을 사용하여 프로젝트를 빌드합니다.
-      - name: Build with Gradle
-        working-directory: ssgssag
-        run: ./gradlew clean build
-
-      # 빌드된 파일 목록을 출력하여 디버깅에 도움을 줍니다.
-      - name: List files for debugging
-        run: ls -la ssgssag/build/libs/
-
-      # 빌드된 JAR 파일을 GitHub Artifact로 업로드합니다.
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ssgssag
-          path: ssgssag/build/libs/ssgssag-0.0.1-SNAPSHOT.jar
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-      # 빌드된 Artifact를 다운로드하여 배포 준비를 합니다.
-      - name: Download build artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: ssgssag
-          path: ssgssag/build/libs/
-
-      # EC2 인스턴스에 애플리케이션을 배포합니다.
-      - name: Deploy to EC2
-        env:
-          DB_URL: ${{ secrets.DB_URL }}
-          DB_USERNAME: ${{ secrets.DB_USERNAME }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      
+       # Grant execute permission for gradlew
+      - name: Grant Execute Permission for Gradlew
+        run: chmod +x ./gradlew
+        
+      - name: Build Project
         run: |
-          # EC2 SSH 키를 private_key.pem 파일로 저장합니다.
-          echo "${{ secrets.EC2_SSH_KEY }}" > private_key.pem
-          chmod 600 private_key.pem
+          echo "spring:" > ssgssag/src/main/resources/application-db.yml
+          echo "  datasource:" >> ssgssag/src/main/resources/application-db.yml
+          echo "    driver-class-name: ${{ secrets.DRIVER_CLASS_NAME }}" >> ssgssag/src/main/resources/application-db.yml
+          echo "    url: ${{ secrets.URL }}" >> ssgssag/src/main/resources/application-db.yml
+          echo "    username: ${{ secrets.USERNAME }}" >> ssgssag/src/main/resources/application-db.yml
+          echo "    password: ${{ secrets.PASSWORD }}" >> ssgssag/src/main/resources/application-db.yml
+        
+
+      # Deploy to Remote Server
+      - name: Deploy to Remote Server
+        env:
+          SERVER_HOST: ${{ secrets.EC2_HOST }}
+          SERVER_USER: ${{ secrets.EC2_USERNAME }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          ssh-keyscan -H $SERVER_HOST >> ~/.ssh/known_hosts
           
-          # SCP를 사용하여 빌드된 JAR 파일을 EC2 서버로 복사합니다.
-          scp -i private_key.pem -o StrictHostKeyChecking=no ssgssag/build/libs/ssgssag-0.0.1-SNAPSHOT.jar ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USERNAME }}/ssgssag.jar
-          
-          # SSH를 사용하여 EC2 서버에 연결하고 환경 변수를 적용한 application.properties 파일을 생성합니다.
-          ssh -i private_key.pem -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} << 'EOF'
-            export DB_URL=${DB_URL}
-            export DB_USERNAME=${DB_USERNAME}
-            export DB_PASSWORD=${DB_PASSWORD}
-  
-            # 기존 application.properties 파일에 환경 변수를 설정합니다.
-            echo "
-            spring.datasource.url=\${DB_URL}
-            spring.datasource.username=\${DB_USERNAME}
-            spring.datasource.password=\${DB_PASSWORD}
-            " >> /home/${{ secrets.EC2_USERNAME }}/application.properties
-  
-            # 이전 Java 프로세스를 종료하고 새로운 프로세스를 실행합니다.
-            pgrep java | xargs kill -9 || true
-            nohup java -jar /home/${{ secrets.EC2_USERNAME }}/ssgssag.jar --spring.config.location=/home/${{ secrets.EC2_USERNAME }}/application.properties > app.log 2>&1 &
+          # SSH into the server and prepare the deployment folder
+          ssh $SERVER_USER@$SERVER_HOST 'bash -s' << 'EOF'
+            sudo mkdir -p /opt/ssgssag/config
+            sudo chown -R $USER:$USER /opt/ssgssag
+            sudo chmod -R 755 /opt/ssgssag
           EOF
           
-          # 사용한 SSH 키 파일을 삭제합니다.
-          rm -f private_key.pem
+          # Copy files to the deployment folder
+          scp -r ./build/libs/*.jar $SERVER_USER@$SERVER_HOST:/opt/ssgssag/
+          scp ./src/main/resources/application-db.properties $SERVER_USER@$SERVER_HOST:/opt/ssgssag/config/
+
+          # Restart the application
+          ssh $SERVER_USER@$SERVER_HOST 'bash -s' << 'EOF'
+            chmod +x /opt/ssgssag/run.sh
+            /opt/ssgssag/run.sh restart
+          EOF
